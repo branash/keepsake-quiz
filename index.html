@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>A few questions</title>
 <style>
-  :root { --canvas:#EAE7E0; --ink:#22242A; --mute:#8B8578; --duck:#7A5C43; --orange:#B85C33; --card:#fff; }
+  :root { --canvas:#EAE7E0; --ink:#22242A; --mute:#8B8578; --duck:#7A5C43; --card:#fff; }
   * { box-sizing:border-box; margin:0; -webkit-tap-highlight-color:transparent; }
   body { background:var(--canvas); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
          padding:20px 18px 40px; max-width:520px; margin:0 auto; }
@@ -14,22 +14,24 @@
   h1 { font-size:26px; font-weight:800; margin:6px 0 4px; letter-spacing:-.02em; }
   .sub { font-size:14px; color:var(--mute); margin-bottom:22px; line-height:1.45; }
   .q { background:var(--card); border-radius:18px; padding:15px 15px 13px; margin-bottom:12px; box-shadow:0 4px 14px rgba(0,0,0,.05); }
-  .q h2 { font-size:16px; font-weight:700; margin-bottom:10px; }
-  .pills { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px; }
+  .q h2 { font-size:16.5px; font-weight:800; margin-bottom:12px; }
+  .fl { font-size:12px; font-weight:700; color:var(--mute); margin:10px 0 7px; text-transform:uppercase; letter-spacing:.05em; }
+  .pills { display:flex; flex-wrap:wrap; gap:7px; }
   .pill { border:0; font:inherit; font-size:13.5px; font-weight:600; padding:8px 13px; border-radius:11px;
           background:rgba(122,92,67,.12); color:var(--ink); }
   .pill.on { background:var(--duck); color:#fff; }
   textarea { width:100%; border:1.5px solid rgba(122,92,67,.25); border-radius:12px; padding:10px 12px; font:inherit;
-             font-size:15px; background:#FBFAF7; resize:none; min-height:44px; }
+             font-size:15px; background:#FBFAF7; resize:none; min-height:44px; margin-top:10px; }
   textarea:focus { outline:none; border-color:var(--duck); }
   .send { display:block; width:100%; border:0; font:inherit; font-size:16px; font-weight:800; color:#fff;
           background:var(--duck); border-radius:17px; padding:16px; margin-top:18px; }
+  .send:disabled { opacity:.55; }
   .copy { display:block; width:100%; border:0; font:inherit; font-size:14px; font-weight:700; color:var(--duck);
           background:rgba(122,92,67,.12); border-radius:14px; padding:13px; margin-top:9px; }
-  .done { text-align:center; padding:40px 10px; display:none; }
-  .done h2 { font-size:22px; font-weight:800; margin-bottom:8px; }
-  .done p { font-size:14px; color:var(--mute); line-height:1.5; }
   .note { font-size:12px; color:var(--mute); text-align:center; margin-top:14px; line-height:1.5; }
+  .done { text-align:center; padding:70px 10px; }
+  .done h2 { font-size:24px; font-weight:800; margin-bottom:8px; }
+  .done p { font-size:14.5px; color:var(--mute); line-height:1.5; }
   .err { text-align:center; color:var(--mute); padding:60px 20px; font-size:15px; line-height:1.6; }
 </style>
 </head>
@@ -37,41 +39,56 @@
 <div id="app"></div>
 <script>
 (function () {
+  var SB_URL = "https://lbyajsscprtpbcbucfyg.supabase.co";
+  var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxieWFqc3NjcHJ0cGJjYnVjZnlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODcxODIsImV4cCI6MjEwMzA2MzE4Mn0.lcT1gh5nUKymeKdSx781iTjPuUkU_YPYb5PFG9z0-jw";
   var app = document.getElementById('app');
   var quiz;
   try {
     var b64 = location.hash.slice(1).replace(/-/g, '+').replace(/_/g, '/');
     while (b64.length % 4) b64 += '=';
     quiz = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if (!quiz.q || !quiz.q.length) throw 0;
   } catch (e) {
     app.innerHTML = '<div class="err">This link is missing its questions.<br>Ask him to send it again.</div>';
     return;
   }
-  var answers = quiz.q.map(function () { return { picks: [], t: '' }; });
+  var answers = quiz.q.map(function (q) { return { f: {}, t: '' }; });
 
   var html = '<div class="from">From ' + esc(quiz.from || 'him') + '</div>' +
     '<h1>A few questions, ' + esc(quiz.to || 'for you') + '</h1>' +
-    '<div class="sub">Tap what fits, type where you want. Skip anything. Nothing here goes to a website or an account: your answers travel straight back in your text message.</div>';
+    '<div class="sub">Tap what fits, add words where you want, skip anything. When you hit send it lands straight in his app. Your answers are sealed with a key that only lives in this link, so nobody in between can read them.</div>';
   quiz.q.forEach(function (q, i) {
     html += '<div class="q"><h2>' + esc(q.ask) + '</h2>';
-    if (q.opts && q.opts.length) {
-      html += '<div class="pills">' + q.opts.map(function (o, j) {
-        return '<button class="pill" data-q="' + i + '" data-o="' + j + '">' + esc(o) + '</button>';
+    (q.f || []).forEach(function (f, j) {
+      if (!f.o || !f.o.length) return;
+      if (f.k !== 'title') html += '<div class="fl">' + esc(f.l) + '</div>';
+      html += '<div class="pills">' + f.o.map(function (o, n) {
+        return '<button class="pill" data-q="' + i + '" data-f="' + j + '" data-o="' + n + '">' + esc(o) + '</button>';
       }).join('') + '</div>';
-    }
-    html += '<textarea data-t="' + i + '" rows="1" placeholder="' + (q.opts && q.opts.length ? 'anything to add, in your words' : 'in your words') + '"></textarea></div>';
+    });
+    html += '<textarea data-t="' + i + '" rows="1" placeholder="anything else, in your words"></textarea></div>';
   });
-  html += '<button class="send" id="send">Send my answers back</button>' +
-    '<button class="copy" id="copy">Or copy them to paste yourself</button>' +
-    '<div class="note">Made in his Keepsake app. Your answers file themselves into it.</div>' +
-    '<div class="done" id="done"><h2>Sent.</h2><p>If Messages did not open, use the copy button and paste it to him.</p></div>';
+  html += '<button class="send" id="send">Send my answers</button>' +
+    '<button class="copy" id="copy" style="display:none">Copy them to text him instead</button>' +
+    '<div class="note">Made in his Keepsake app.</div>';
   app.innerHTML = html;
 
   app.addEventListener('click', function (e) {
     var b = e.target.closest('.pill'); if (!b) return;
-    var q = +b.dataset.q, label = quiz.q[q].opts[+b.dataset.o];
-    var arr = answers[q].picks, at = arr.indexOf(label);
-    if (at >= 0) arr.splice(at, 1); else arr.push(label);
+    var qi = +b.dataset.q, fi = +b.dataset.f, f = quiz.q[qi].f[fi];
+    var label = f.o[+b.dataset.o];
+    var cur = (answers[qi].f[f.k] || []);
+    var at = cur.indexOf(label);
+    if (at >= 0) { cur.splice(at, 1); }
+    else {
+      if (!f.m) {
+        cur = [];
+        // clear siblings of a single-pick field
+        app.querySelectorAll('.pill[data-q="' + qi + '"][data-f="' + fi + '"]').forEach(function (x) { x.classList.remove('on'); });
+      }
+      cur.push(label);
+    }
+    answers[qi].f[f.k] = cur;
     b.classList.toggle('on', at < 0);
   });
   app.addEventListener('input', function (e) {
@@ -81,22 +98,61 @@
     }
   });
 
-  function code() {
-    var reply = { v: 1, a: quiz.q.map(function (q, i) {
-      return { p: q.p, picks: answers[i].picks, t: answers[i].t.trim() };
-    }).filter(function (a) { return a.picks.length || a.t; }) };
-    var b = btoa(unescape(encodeURIComponent(JSON.stringify(reply))))
-      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    return 'KPSK1.' + b;
+  function reply() {
+    return { v: 2, id: quiz.id, a: quiz.q.map(function (q, i) {
+      var f = {};
+      Object.keys(answers[i].f).forEach(function (k) {
+        if (answers[i].f[k].length) f[k] = answers[i].f[k].join(', ');
+      });
+      return { p: q.p, f: f, t: answers[i].t.trim() };
+    }).filter(function (a) { return Object.keys(a.f).length || a.t; }) };
   }
-  document.getElementById('send').addEventListener('click', function () {
-    var body = 'My answers: ' + code();
-    document.getElementById('done').style.display = 'block';
-    location.href = 'sms:&body=' + encodeURIComponent(body);
+  function b64url(bytes) {
+    var s = ''; bytes = new Uint8Array(bytes);
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s);
+  }
+  function keyBytes() {
+    var b = quiz.k.replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    var raw = atob(b), out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  async function sealed() {
+    var data = new TextEncoder().encode(JSON.stringify(reply()));
+    var key = await crypto.subtle.importKey('raw', keyBytes(), 'AES-GCM', false, ['encrypt']);
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, data));
+    var combined = new Uint8Array(iv.length + ct.length);
+    combined.set(iv); combined.set(ct, iv.length);
+    return b64url(combined);
+  }
+  document.getElementById('send').addEventListener('click', async function () {
+    var btn = this;
+    if (!reply().a.length) { btn.textContent = 'Tap or type at least one thing first'; return; }
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      var c = await sealed();
+      var res = await fetch(SB_URL + '/rest/v1/quiz_replies', {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+                   'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ quiz_id: quiz.id, payload: { c: c } })
+      });
+      if (!res.ok) throw 0;
+      app.innerHTML = '<div class="done"><h2>Sent.</h2><p>It lands in his app the next time he opens it.<br>Thanks for playing along.</p></div>';
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Send my answers';
+      var cp = document.getElementById('copy');
+      cp.style.display = 'block';
+      cp.textContent = 'No signal? Copy the answers to text him instead';
+    }
   });
   document.getElementById('copy').addEventListener('click', function () {
-    var t = 'My answers: ' + code();
-    if (navigator.clipboard) navigator.clipboard.writeText(t);
+    var code = 'My answers: KPSK2.' + btoa(unescape(encodeURIComponent(JSON.stringify(reply()))))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    if (navigator.clipboard) navigator.clipboard.writeText(code);
     this.textContent = 'Copied. Paste it into a text to him.';
   });
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) {
