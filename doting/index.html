@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Doting — every detail they'd be amazed you remembered</title>
+<meta name="description" content="The private notebook for the person you love. Sizes, orders, dates, the flowers to never buy. Quiz them by text; answers file themselves. No account, everything on your phone.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+<style>
+  :root{--canvas:#EAE7E0;--ink:#222426;--ink2:rgba(34,36,38,.62);--orange:#B85C33;--duck:#7A5C43;--moss:#6D714C;--white:#fff;--line:rgba(34,36,38,.12)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--canvas);color:var(--ink);font:17px/1.55 Nunito,-apple-system,system-ui,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 22px 80px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;letter-spacing:-.01em}
+  .heart{width:34px;height:34px;border-radius:9px;background:var(--orange);display:grid;place-items:center;color:#fff;font-size:17px}
+  h1{font-size:clamp(34px,6.5vw,58px);font-weight:900;letter-spacing:-.025em;line-height:1.08;margin:.9em 0 0;max-width:17ch;text-wrap:balance}
+  h1 span{color:var(--orange)}
+  .sub{font-size:clamp(17px,2.4vw,21px);color:var(--ink2);max-width:52ch;margin:.9em 0 0}
+  .cta{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;max-width:520px}
+  .cta input{flex:1;min-width:220px;font:600 16px Nunito;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--white);color:var(--ink)}
+  .cta button{font:800 16px Nunito;padding:14px 22px;border:0;border-radius:14px;background:var(--orange);color:#fff;cursor:pointer}
+  .cta button:hover{filter:brightness(1.06)}
+  .note{font-size:13.5px;color:var(--ink2);margin-top:10px}
+  .ok{color:var(--moss);font-weight:800}
+  .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:64px}
+  .shots img{width:100%;border-radius:26px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.16);display:block}
+  @media(max-width:760px){.shots{grid-template-columns:1fr 1fr}.shots img:nth-child(3){display:none}}
+  section{margin-top:80px}
+  h2{font-size:clamp(24px,4vw,34px);font-weight:900;letter-spacing:-.02em;margin:0 0 .3em;text-wrap:balance}
+  p{color:var(--ink2);max-width:60ch;margin:.5em 0}
+  b{color:var(--ink)}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+  @media(max-width:760px){.three{grid-template-columns:1fr}}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px 22px}
+  .card h3{margin:0 0 6px;font-size:17px;font-weight:800;color:var(--duck)}
+  .card p{font-size:15px;margin:0}
+  footer{margin-top:90px;padding-top:22px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--ink2)}
+  footer a{color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="heart">♥</span> Doting</div>
+
+  <h1>Every detail they'd be <span>amazed</span> you remembered.</h1>
+  <p class="sub">Sizes that fit. The exact coffee order. The flowers to never buy. Doting is the
+  private notebook for the person you love, and the game that fills it in for you.</p>
+
+  <form class="cta" id="wl">
+    <input type="email" required placeholder="you@email.com" id="em" aria-label="Email address">
+    <button type="submit">Get it first</button>
+  </form>
+  <p class="note" id="wlnote">Coming to the App Store. Leave your email and be first in line. Nothing else, ever.</p>
+
+  <div class="shots">
+    <img src="home.png" alt="The Doting home screen: her categories, color-coded">
+    <img src="quiz.png" alt="A three-question round, ready to text">
+    <img src="guess.png" alt="The guess game: call her answers">
+  </div>
+
+  <section>
+    <h2>Don't know the answers? That's the fun part.</h2>
+    <p>Send a little <b>3-question round</b> by text. They answer in the browser in ten seconds:
+    no app to install, no account to make. The answers come back to you as a game: <b>call what
+    they said</b>, see how well you really know them, and every answer files itself into the
+    notebook forever. Wrong guesses cost nothing. They're the map filling in.</p>
+  </section>
+
+  <section>
+    <div class="three">
+      <div class="card"><h3>Buttons before typing</h3><p>Every answer is a tap. Save her exact order in a store aisle in five seconds.</p></div>
+      <div class="card"><h3>It knows where you are</h3><p>Walk into Target and her sizes are already up. Starbucks, and it's her order.</p></div>
+      <div class="card"><h3>Private by architecture</h3><p>No account. No cloud. Quiz answers sealed end to end. Your marriage is not our data.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Made by a husband who kept forgetting.</span>
+    <a href="../privacy.html">Privacy</a>
+    <a href="../terms.html">Terms</a>
+  </footer>
+</div>
+<script>
+(function(){
+  var f=document.getElementById('wl'),n=document.getElementById('wlnote');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var em=document.getElementById('em').value.trim();
+    if(!em)return;
+    fetch("https://lbyajsscprtpbcbucfyg.supabase.co/rest/v1/doting_waitlist",{method:"POST",headers:{
+      "apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxieWFqc3NjcHJ0cGJjYnVjZnlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODcxODIsImV4cCI6MjEwMzA2MzE4Mn0.lcT1gh5nUKymeKdSx781iTjPuUkU_YPYb5PFG9z0-jw","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxieWFqc3NjcHJ0cGJjYnVjZnlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODcxODIsImV4cCI6MjEwMzA2MzE4Mn0.lcT1gh5nUKymeKdSx781iTjPuUkU_YPYb5PFG9z0-jw","Content-Type":"application/json"},
+      body:JSON.stringify({email:em})})
+    .then(function(r){ n.innerHTML = r.ok ? '<span class="ok">You\'re on the list. First in line when it ships.</span>'
+                                          : 'That didn\'t go through. Try once more?'; })
+    .catch(function(){ n.textContent='No signal? Try again in a moment.'; });
+  });
+})();
+</script>
+</body>
+</html>
